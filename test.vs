@@ -2,8 +2,10 @@
 
 
 .input
+                    .int
     $i
 .var
+.cb
 @i
     .print
 
