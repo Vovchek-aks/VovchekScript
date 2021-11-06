@@ -33,11 +33,6 @@ class FloatType(BaseType):
 class StrType(BaseType):
     MY_TYPE = str
 
-    # relocate to ImplementedFuncs
-    # @classmethod
-    # def convert_to(cls, text: str) -> type(MY_TYPE):
-    #
-
 
 class BoolType(BaseType):
     MY_TYPE = bool
