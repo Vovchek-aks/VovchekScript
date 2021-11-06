@@ -1,22 +1,32 @@
-увуввув
-
-
-.input
-                    .int
-    $i
-.var
+!123
+!123
+.print
 .cb
-@i
-    .print
+ist comment
 
+$abobus\nbobus\na
+$b
+.var
 
+$\n
+.compile_str
+$n
+.var
 
-eded
+@n
+.print
+.print
+.cb
 
+@b
+.print
+.cb
 
-    efefef
+@n
+.print
+.print
+.cb
 
-
-
-
-
+@b
+.compile_str
+.print
