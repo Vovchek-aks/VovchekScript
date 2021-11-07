@@ -1,4 +1,4 @@
-import lang_types as t
+import types_shit as t
 
 
 class Value:
@@ -14,11 +14,17 @@ class Value:
     def to_str(self):
         return self.type.to_str(self.val)
 
+    # def __repr__(self):
+    #     return f'{t.TypeType.to_str(self.type)}: {self.type.to_str(self.val)}'
+
 
 class Variable:
     def __init__(self, name: str, value: Value):
         self.name = name
         self.value = value
+
+    # def __repr__(self):
+    #     return f'{self.name} = {self.value.__repr__()}'
 
 
 class BufferManager:
@@ -34,11 +40,11 @@ class BufferManager:
 
 
 class VariablesManager:
-    variables = []
+    variables = set()
 
     @staticmethod
     def add(var: Variable) -> None:
-        VariablesManager.variables += [var]
+        VariablesManager.variables.add(var)
 
     @staticmethod
     def get(name: str) -> Variable:
@@ -46,7 +52,7 @@ class VariablesManager:
         if len(ret) == 1:
             return ret[0]
 
-        raise NameError(f'No variable with name {name}')
+        raise NameError(f'No variable with name "{name}"')
 
     @staticmethod
     def delete(name: str) -> None:

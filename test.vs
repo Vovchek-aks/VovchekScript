@@ -1,32 +1,33 @@
-!123
-!123
-.print
-.cb
-ist comment
-
-$abobus\nbobus\na
-$b
-.var
-
 $\n
 .compile_str
 $n
 .var
 
-@n
-.print
-.print
-.cb
+!0
+$i
+.var
 
-@b
-.print
-.cb
+.rep_start
+    @i
+    .print
+    .cb
+    @n
+    .print
+    .cb
 
-@n
-.print
-.print
-.cb
+    !1
+    $i
+    .sum_to
+    .cb
 
-@b
-.compile_str
-.print
+    @i
+    !10
+    .eq
+    .if_start
+        .cb
+        $stop
+        .print
+        .rep_stop
+    .if_end
+    .cb
+.rep_end

@@ -1,5 +1,5 @@
 import data_shit as ds
-import lang_types as t
+import types_shit as ts
 
 
 class BaseCommand:
@@ -9,7 +9,7 @@ class BaseCommand:
 
         self.com = com
 
-    def execute(self):
+    def execute(self, runner):
         pass
 
     def __repr__(self):
@@ -24,14 +24,14 @@ class BaseCommand:
 
 class DataCommand(BaseCommand):
     SYMBOL_TO_TYPE = {
-        '~': t.TypeType,
-        '!': t.IntType,
-        '%': t.FloatType,
-        '$': t.StrType,
-        '?': t.BoolType
+        '~': ts.TypeType,
+        '!': ts.IntType,
+        '%': ts.FloatType,
+        '$': ts.StrType,
+        '?': ts.BoolType
     }
 
-    def execute(self):
+    def execute(self, runner):
         val = None
 
         if self.com[0] == '@':
@@ -44,27 +44,44 @@ class DataCommand(BaseCommand):
 
 
 class ExecutedCommand(BaseCommand):
-    def execute(self):
+    def execute(self, runner):
         f = ImplementedFuncs.__dict__.get(f'f_{self.com[1:]}', None)
         if f is not None:
-            f(None)
+            f(None, runner)
         else:
-            raise NotImplementedError(f'No command with name {self.com[1:]}')
+            raise NameError(f'No command with name "{self.com[1:]}"')
 
 
 class ImplementedFuncs:
-    def f_var(self):
+    @staticmethod
+    def buf_len_check(fname: str, n: int):
+        buf = ds.BufferManager.buffer.val
+        if len(buf) != n:
+            raise ValueError(f'"{fname}" can be used only with {n} value in the buffer, not {len(buf)}')
+
+    @staticmethod
+    def type_check(fname: str, type_: ts.BaseType, val: ds.Value):
+        type_ = type_.__class__
+
+        if val.type != type_:
+            raise TypeError(
+                f'"{fname}" can be used only with {ts.TypeType.to_str(type_)} type, not {ts.TypeType.to_str(val.type)}')
+
+    def f_pass(self, runner):
+        pass
+
+    def f_var(self, runner):
         buf = ds.BufferManager.buffer.val
         if len(buf) != 2:
             raise ValueError('To make a variable u need exactly 2 values in the buffer')
 
-        if buf[1].type != t.StrType:
-            raise ValueError('Variable name must be str')
+        if buf[1].type != ts.StrType:
+            raise TypeError('Variable name must be str type')
 
         ds.VariablesManager.add(ds.Variable(buf[1].val, buf[0]))
         ds.BufferManager.clear()
 
-    def f_print(self):
+    def f_print(self, runner):
         buf = ds.BufferManager.buffer.val
         if len(buf) == 0:
             print(end='')
@@ -73,22 +90,20 @@ class ImplementedFuncs:
         else:
             print(ds.BufferManager.buffer.to_str(), end='')
 
-    def f_input(self):
-        ds.BufferManager.add(ds.Value(t.StrType(), input()))
+    def f_input(self, runner):
+        ds.BufferManager.add(ds.Value(ts.StrType(), input()))
 
-    def f_int(self):
+    def f_int(self, runner):
         buf = ds.BufferManager.buffer.val
-        if len(buf) != 1:
-            raise ValueError(f'".int" can be used only with 1 value in the buffer, not {len(buf)}')
+        ImplementedFuncs.buf_len_check('int', 1)
 
         n = int(buf[0].val)
         ds.BufferManager.clear()
-        ds.BufferManager.add(ds.Value(t.IntType(), n))
+        ds.BufferManager.add(ds.Value(ts.IntType(), n))
 
-    def f_sum(self):
+    def f_sum(self, runner):
         buf = ds.BufferManager.buffer.val
-        if len(buf) != 2:
-            raise ValueError(f'".sum" can be used only with 2 value in the buffer, not {len(buf)}')
+        ImplementedFuncs.buf_len_check('sum', 2)
 
         if buf[0].type != buf[1].type:
             raise TypeError(f'".sum" can be used only with same types, not {buf[0].type} and {buf[1].type}')
@@ -99,24 +114,78 @@ class ImplementedFuncs:
         ds.BufferManager.clear()
         ds.BufferManager.add(ds.Value(tp(), v))
 
-    def f_space(self):
-        ds.BufferManager.add(ds.Value(t.StrType(), ' '))
+    def f_space(self, runner):
+        ds.BufferManager.add(ds.Value(ts.StrType(), ' '))
 
-    def f_cb(self):
+    def f_cb(self, runner):
         ds.BufferManager.clear()
 
-    def f_compile_str(self):
+    def f_compile_str(self, runner):
         buf = ds.BufferManager.buffer.val
-        if len(buf) != 1:
-            raise ValueError(f'".str_compile" can be used only with 1 value in the buffer, not {len(buf)}')
+        ImplementedFuncs.buf_len_check('compile_str', 1)
 
-        if buf[0].type != t.StrType:
-            raise ValueError(f'".str_compile" can be used only with str, not {buf[0].type}')
+        if buf[0].type != ts.StrType:
+            raise TypeError(f'".str_compile" can be used only with str, not {buf[0].type}')
 
         v = buf[0].val.replace('\\n', '\n').replace('\\t', '\t')
 
         ds.BufferManager.clear()
-        ds.BufferManager.add(ds.Value(t.StrType(), v))
+        ds.BufferManager.add(ds.Value(ts.StrType(), v))
+
+    def f_rep_start(self, runner):
+        pass
+
+    def f_rep_end(self, runner):
+        runner.find_com_up('.rep_start')
+
+    def f_rep_stop(self, runner):
+        runner.find_com_down('.rep_end')
+
+    def f_if_start(self, runner):
+        ImplementedFuncs.buf_len_check('.if_start', 1)
+        val = ds.BufferManager.buffer.val[0]
+        ImplementedFuncs.type_check('.if_start', ts.BoolType(), val)
+
+        if not val.val:
+            runner.find_com_down('.if_end')
+
+    def f_if_end(self, runner):
+        pass
+
+    def f_sum_to(self, runner):
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.buf_len_check('sum_to', 2)
+
+        var = ds.VariablesManager.get(buf[1].val)
+
+        if buf[0].type != var.value.type:
+            raise TypeError(f'".sum_to" can be used only with same types, not {buf[0].type} and {var.value.type}')
+
+        var.value.val += buf[0].val
+
+    def f_bool(self, runner):
+        buf = ds.BufferManager.buffer
+        ds.BufferManager.clear()
+        f = False
+        if len(buf.val) > 1:
+            f = True
+        elif len(buf.val) == 1:
+            if buf.val[0].type == ts.StrType and len(buf.val[0].val) > 0:
+                f = True
+            elif buf.val[0].type in (ts.IntType, ts.FloatType) and buf.val[0].val != 0:
+                f = True
+
+        ds.BufferManager.add(ds.Value(ts.BoolType(), f))
+
+    def f_eq(self, runner):
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.buf_len_check('.eq', 2)
+
+        ds.BufferManager.clear()
+        ds.BufferManager.add(ds.Value(ts.BoolType(), buf[0].val == buf[1].val))
+
+
+
 
 
 
