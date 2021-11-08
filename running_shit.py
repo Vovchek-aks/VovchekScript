@@ -20,15 +20,31 @@ class Runner:
         self.program[self.cursor].execute(self)
         return self.next()
 
-    def find_com_down(self, com: str) -> None:
+    def find_com_down(self, com: str, com2=None) -> None:
         c = self.program[self.cursor].com
-        while self.program[self.cursor].com != com:
+        n = 0 if com2 else 1
+        while True:
+            if self.program[self.cursor].com == com:
+                n -= 1
+                if not n:
+                    break
+            elif self.program[self.cursor].com == com2:
+                n += 1
+
             if self.next():
                 raise NameError(f'No "{com}" command after "{c}"')
 
-    def find_com_up(self, com: str) -> None:
+    def find_com_up(self, com: str, com2=None) -> None:
         c = self.program[self.cursor].com
-        while self.program[self.cursor].com != com:
+        n = 0 if com2 else 1
+        while True:
+            if self.program[self.cursor].com == com:
+                n -= 1
+                if not n:
+                    break
+            elif self.program[self.cursor].com == com2:
+                n += 1
+
             if self.back():
                 raise NameError(f'No "{com}" command before "{c}"')
 

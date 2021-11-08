@@ -44,6 +44,15 @@ class VariablesManager:
 
     @staticmethod
     def add(var: Variable) -> None:
+        f = True
+        try:
+            VariablesManager.get(var.name)
+        except NameError:
+            f = False
+
+        if f:
+            VariablesManager.delete(var.name)
+
         VariablesManager.variables.add(var)
 
     @staticmethod
@@ -56,7 +65,7 @@ class VariablesManager:
 
     @staticmethod
     def delete(name: str) -> None:
-        VariablesManager.variables = list(filter(lambda x: x.name != name, VariablesManager.variables))
+        VariablesManager.variables = set(filter(lambda x: x.name != name, VariablesManager.variables))
 
 
 class FuncsManager:

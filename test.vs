@@ -1,6 +1,6 @@
-$\n
-.compile_str
-$n
+.input
+.int
+$max
 .var
 
 !0
@@ -11,22 +11,48 @@ $i
     @i
     .print
     .cb
-    @n
     .print
-    .cb
 
     !1
+    @i
+    .sum
     $i
-    .sum_to
+    .var
+
+    !0
+    $n
+    .var
+
+    .rep_start
+        @n
+        .print
+        .cb
+        .space
+        .print
+        .cb
+
+        !1
+        @n
+        .sum
+        $n
+        .var
+
+        @n
+        @i
+        .eq
+        .if_start
+            .cb
+            .print
+            .rep_stop
+        .if_end
+        .cb
+    .rep_end
     .cb
 
     @i
-    !10
+    @max
     .eq
     .if_start
-        .cb
-        $stop
-        .print
         .rep_stop
     .if_end
     .cb

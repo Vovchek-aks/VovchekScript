@@ -84,7 +84,7 @@ class ImplementedFuncs:
     def f_print(self, runner):
         buf = ds.BufferManager.buffer.val
         if len(buf) == 0:
-            print(end='')
+            print()
         elif len(buf) == 1:
             print(buf[0].to_str(), end='')
         else:
@@ -136,7 +136,7 @@ class ImplementedFuncs:
         pass
 
     def f_rep_end(self, runner):
-        runner.find_com_up('.rep_start')
+        runner.find_com_up('.rep_start', '.rep_end')
 
     def f_rep_stop(self, runner):
         runner.find_com_down('.rep_end')
@@ -147,21 +147,21 @@ class ImplementedFuncs:
         ImplementedFuncs.type_check('.if_start', ts.BoolType(), val)
 
         if not val.val:
-            runner.find_com_down('.if_end')
+            runner.find_com_down('.if_end', '.if_start')
 
     def f_if_end(self, runner):
         pass
 
-    def f_sum_to(self, runner):
-        buf = ds.BufferManager.buffer.val
-        ImplementedFuncs.buf_len_check('sum_to', 2)
-
-        var = ds.VariablesManager.get(buf[1].val)
-
-        if buf[0].type != var.value.type:
-            raise TypeError(f'".sum_to" can be used only with same types, not {buf[0].type} and {var.value.type}')
-
-        var.value.val += buf[0].val
+    # def f_sum_to(self, runner):
+    #     buf = ds.BufferManager.buffer.val
+    #     ImplementedFuncs.buf_len_check('sum_to', 2)
+    #
+    #     var = ds.VariablesManager.get(buf[1].val)
+    #
+    #     if buf[0].type != var.value.type:
+    #         raise TypeError(f'".sum_to" can be used only with same types, not {buf[0].type} and {var.value.type}')
+    #
+    #     var.value.val += buf[0].val
 
     def f_bool(self, runner):
         buf = ds.BufferManager.buffer
