@@ -1,4 +1,5 @@
 import types_shit as t
+import running_shit as rs
 
 
 class Value:
@@ -40,7 +41,7 @@ class BufferManager:
         BufferManager.buffer.val = []
 
     @staticmethod
-    def get():
+    def get() -> Value:
         return eval('BufferManager.buffer' + '.val[-1]' * BufferManager.depth_of_lists)
 
 
@@ -62,6 +63,11 @@ class VariablesManager:
 
     @staticmethod
     def get(name: str) -> Variable:
+        for st_el in FuncsManager.stack[::-1]:
+            ret = st_el.get_var(name)
+            if ret is not None:
+                return ret
+
         ret = tuple(filter(lambda x: x.name == name, VariablesManager.variables))
         if len(ret) == 1:
             return ret[0]
@@ -73,34 +79,75 @@ class VariablesManager:
         VariablesManager.variables = set(filter(lambda x: x.name != name, VariablesManager.variables))
 
 
+class StackElement:
+    def __init__(self, line: int):
+        self.line = line
+        self.vars = set()
+
+    def get_var(self, name: str) -> Variable:
+        ret = tuple(filter(lambda x: x.name == name, self.vars))
+
+        if len(ret):
+            return ret[0]
+
+        return None
+
+    def add_var(self, var: Variable) -> None:
+        f = True
+        try:
+            self.get_var(var.name)
+        except NameError:
+            f = False
+
+        if f:
+            self.del_var(var.name)
+
+        self.vars.add(var)
+
+    def del_var(self, name: str) -> None:
+        self.vars = set(filter(lambda x: x.name != name, self.vars))
+
+
 class FuncsManager:
-    funcs = {}
+    funcs = set()
     stack = []
 
     @staticmethod
     def add(name: str, line: int) -> None:
-        FuncsManager.funcs[name] = line
+        f = True
+        try:
+            FuncsManager.get_line(name)
+        except NameError:
+            f = False
+
+        if f:
+            raise NameError(f'Command with name ".{name}" already exists')
+
+        FuncsManager.funcs.add((name, line))
 
     @staticmethod
-    def get(name: str) -> int:
-        return tuple(filter(lambda x: x.name == name, FuncsManager.funcs))[0]
+    def get_line(name: str) -> int:
+        f = tuple(filter(lambda x: x[0] == name, FuncsManager.funcs))
+        if not len(f):
+            raise NameError(f'No command with name "{name}"')
+
+        return f[0][1]
 
     @staticmethod
     def delete(name: str) -> None:
-        FuncsManager.funcs = list(filter(lambda x: x.name != name, FuncsManager.funcs))
+        FuncsManager.funcs = set(filter(lambda x: x[0] != name, FuncsManager.funcs))
 
     @staticmethod
-    def fun_execute(name: str, cur_line: int) -> None:
-        f_line = FuncsManager.get(name)
-        FuncsManager.stack += [cur_line]
+    def fun_execute(name: str, runner: rs.Runner) -> None:
+        f_line = FuncsManager.get_line(name)
+        FuncsManager.stack += [StackElement(runner.cursor)]
 
-        raise NotImplementedError()
+        runner.goto(f_line)
 
     @staticmethod
-    def fun_return(name: str) -> None:
-        ret_line = FuncsManager.stack.pop(-1)
+    def fun_return(runner: rs.Runner) -> None:
+        runner.goto(FuncsManager.stack.pop(-1).line)
 
-        raise NotImplementedError()
 
 
 

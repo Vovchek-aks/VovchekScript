@@ -1,5 +1,6 @@
 import data_shit as ds
 import types_shit as ts
+import running_shit as rs
 
 
 class BaseCommand:
@@ -49,39 +50,44 @@ class ExecutedCommand(BaseCommand):
         if f is not None:
             f(None, runner)
         else:
-            raise NameError(f'No command with name "{self.com[1:]}"')
+            ds.FuncsManager.fun_execute(self.com[1:], runner)
 
 
 class ImplementedFuncs:
     @staticmethod
-    def buf_len_check(fname: str, n: int):
+    def buf_len_check(fname: str, n: int) -> None:
         buf = ds.BufferManager.buffer.val
         if len(buf) != n:
             raise ValueError(f'"{fname}" can be used only with {n} value in the buffer, not {len(buf)}')
 
     @staticmethod
-    def type_check(fname: str, type_: ts.BaseType, val: ds.Value):
+    def type_check(fname: str, type_: ts.BaseType, val: ds.Value) -> None:
         type_ = type_.__class__
 
         if val.type != type_:
             raise TypeError(
                 f'"{fname}" can be used only with {ts.TypeType.to_str(type_)} type, not {ts.TypeType.to_str(val.type)}')
 
-    def f_pass(self, runner):
+    def f_pass(self, runner: rs.Runner) -> None:
         pass
 
-    def f_var(self, runner):
+    def f_var(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer.val
-        if len(buf) != 2:
-            raise ValueError('To make a variable u need exactly 2 values in the buffer')
-
-        if buf[1].type != ts.StrType:
-            raise TypeError('Variable name must be str type')
+        ImplementedFuncs.buf_len_check('.var', 2)
+        ImplementedFuncs.type_check('.var', ts.StrType(), buf[1])
 
         ds.VariablesManager.add(ds.Variable(buf[1].val, buf[0]))
         ds.BufferManager.clear()
 
-    def f_print(self, runner):
+    def f_fvar(self, runner: rs.Runner) -> None:
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.buf_len_check('.fvar', 2)
+        ImplementedFuncs.type_check('.fvar', ts.StrType(), buf[1])
+
+        ds.FuncsManager.stack[-1].add_var(ds.Variable(buf[1].val, buf[0]))
+        ds.BufferManager.clear()
+
+    def f_print(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer.val
         if len(buf) == 0:
             print()
@@ -90,10 +96,10 @@ class ImplementedFuncs:
         else:
             print(ds.BufferManager.buffer.to_str(), end='')
 
-    def f_input(self, runner):
+    def f_input(self, runner: rs.Runner) -> None:
         ds.BufferManager.add(ds.Value(ts.StrType(), input()))
 
-    def f_int(self, runner):
+    def f_int(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.buf_len_check('int', 1)
 
@@ -101,7 +107,7 @@ class ImplementedFuncs:
         ds.BufferManager.clear()
         ds.BufferManager.add(ds.Value(ts.IntType(), n))
 
-    def f_sum(self, runner):
+    def f_sum(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.buf_len_check('sum', 2)
 
@@ -114,25 +120,25 @@ class ImplementedFuncs:
         ds.BufferManager.clear()
         ds.BufferManager.add(ds.Value(tp(), v))
 
-    def f_space(self, runner):
+    def f_space(self, runner: rs.Runner) -> None:
         ds.BufferManager.add(ds.Value(ts.StrType(), ' '))
 
-    def f_list(self, runner):
+    def f_list(self, runner: rs.Runner) -> None:
         ds.BufferManager.add(ds.Value(ts.ListType(), []))
 
-    def f_list_start(self, runner):
+    def f_list_start(self, runner: rs.Runner) -> None:
         ds.BufferManager.add(ds.Value(ts.ListType(), []))
         ds.BufferManager.depth_of_lists += 1
 
-    def f_list_end(self, runner):
+    def f_list_end(self, runner: rs.Runner) -> None:
         if not ds.BufferManager.depth_of_lists:
             raise ValueError('command ".list_end" must be after ".list_start"')
         ds.BufferManager.depth_of_lists -= 1
 
-    def f_cb(self, runner):
+    def f_cb(self, runner: rs.Runner) -> None:
         ds.BufferManager.clear()
 
-    def f_compile_str(self, runner):
+    def f_compile_str(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.buf_len_check('compile_str', 1)
 
@@ -144,16 +150,32 @@ class ImplementedFuncs:
         ds.BufferManager.clear()
         ds.BufferManager.add(ds.Value(ts.StrType(), v))
 
-    def f_rep_start(self, runner):
+    def f_rep_start(self, runner: rs.Runner) -> None:
         pass
 
-    def f_rep_end(self, runner):
+    def f_rep_end(self, runner: rs.Runner) -> None:
         runner.find_com_up('.rep_start', '.rep_end')
 
-    def f_rep_stop(self, runner):
+    def f_rep_stop(self, runner: rs.Runner) -> None:
         runner.find_com_down('.rep_end')
 
-    def f_if_start(self, runner):
+    def f_fun_start(self, runner: rs.Runner) -> None:
+        ImplementedFuncs.buf_len_check('.fun_start', 1)
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.type_check('.fun_start', ts.StrType(), buf[0])
+
+        ds.FuncsManager.add(buf[0].val, runner.cursor)
+        ds.BufferManager.clear()
+
+        runner.find_com_down('.fun_end')
+
+    def f_fun_end(self, runner: rs.Runner) -> None:
+        ds.FuncsManager.fun_return(runner)
+
+    def f_fun_stop(self, runner: rs.Runner) -> None:
+        ImplementedFuncs.f_fun_end(None, runner)
+
+    def f_if_start(self, runner: rs.Runner) -> None:
         ImplementedFuncs.buf_len_check('.if_start', 1)
         val = ds.BufferManager.buffer.val[0]
         ImplementedFuncs.type_check('.if_start', ts.BoolType(), val)
@@ -161,40 +183,44 @@ class ImplementedFuncs:
         if not val.val:
             runner.find_com_down('.if_end', '.if_start')
 
-    def f_if_end(self, runner):
+    def f_if_end(self, runner: rs.Runner) -> None:
         pass
 
-    # def f_sum_to(self, runner):
-    #     buf = ds.BufferManager.buffer.val
-    #     ImplementedFuncs.buf_len_check('sum_to', 2)
-    #
-    #     var = ds.VariablesManager.get(buf[1].val)
-    #
-    #     if buf[0].type != var.value.type:
-    #         raise TypeError(f'".sum_to" can be used only with same types, not {buf[0].type} and {var.value.type}')
-    #
-    #     var.value.val += buf[0].val
-
-    def f_bool(self, runner):
+    def f_bool(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer
-        ds.BufferManager.clear()
-        f = False
-        if len(buf.val) > 1:
-            f = True
-        elif len(buf.val) == 1:
-            if buf.val[0].type == ts.StrType and len(buf.val[0].val) > 0:
-                f = True
-            elif buf.val[0].type in (ts.IntType, ts.FloatType) and buf.val[0].val != 0:
-                f = True
 
+        ImplementedFuncs.buf_len_check('.bool', 1)
+
+        f = False
+        if buf.val[0].type in (ts.StrType, ts.ListType) and len(buf.val[0].val) > 0:
+            f = True
+        elif buf.val[0].type in (ts.IntType, ts.FloatType) and buf.val[0].val != 0:
+            f = True
+
+        ds.BufferManager.clear()
         ds.BufferManager.add(ds.Value(ts.BoolType(), f))
 
-    def f_eq(self, runner):
+    def f_eq(self, runner: rs.Runner) -> None:
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.buf_len_check('.eq', 2)
 
         ds.BufferManager.clear()
         ds.BufferManager.add(ds.Value(ts.BoolType(), buf[0].val == buf[1].val))
+
+    def f_gt(self, runner: rs.Runner) -> None:
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.buf_len_check('.gt', 2)
+
+        ds.BufferManager.clear()
+        ds.BufferManager.add(ds.Value(ts.BoolType(), buf[0].val > buf[1].val))
+
+    def f_not(self, runner: rs.Runner) -> None:
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.buf_len_check('.not', 1)
+        ImplementedFuncs.type_check('.not', ts.BoolType(), buf[0])
+
+        ds.BufferManager.clear()
+        ds.BufferManager.add(ds.Value(ts.BoolType(), not buf[0].val))
 
 
 

@@ -1,8 +1,3 @@
-import data_shit as ds
-import types_shit as ts
-import program_shit as ps
-
-
 class Runner:
     def __init__(self, program: list):
         self.program = program
