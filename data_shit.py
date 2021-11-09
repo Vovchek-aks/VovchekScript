@@ -29,14 +29,19 @@ class Variable:
 
 class BufferManager:
     buffer = Value(t.ListType(), [])
+    depth_of_lists = 0
 
     @staticmethod
     def add(val: Value) -> None:
-        BufferManager.buffer.val += [val]
+        BufferManager.get().val += [val]
 
     @staticmethod
     def clear() -> None:
         BufferManager.buffer.val = []
+
+    @staticmethod
+    def get():
+        return eval('BufferManager.buffer' + '.val[-1]' * BufferManager.depth_of_lists)
 
 
 class VariablesManager:

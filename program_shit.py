@@ -117,6 +117,18 @@ class ImplementedFuncs:
     def f_space(self, runner):
         ds.BufferManager.add(ds.Value(ts.StrType(), ' '))
 
+    def f_list(self, runner):
+        ds.BufferManager.add(ds.Value(ts.ListType(), []))
+
+    def f_list_start(self, runner):
+        ds.BufferManager.add(ds.Value(ts.ListType(), []))
+        ds.BufferManager.depth_of_lists += 1
+
+    def f_list_end(self, runner):
+        if not ds.BufferManager.depth_of_lists:
+            raise ValueError('command ".list_end" must be after ".list_start"')
+        ds.BufferManager.depth_of_lists -= 1
+
     def f_cb(self, runner):
         ds.BufferManager.clear()
 
