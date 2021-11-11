@@ -34,6 +34,9 @@ class BufferManager:
 
     @staticmethod
     def add(val: Value) -> None:
+        if val.__class__ != Value:
+            raise TypeError(f'U can add to buffer only Value class, not "{val.__class__.__name__}"')
+
         BufferManager.get().val += [val]
 
     @staticmethod
@@ -76,7 +79,15 @@ class VariablesManager:
 
     @staticmethod
     def delete(name: str) -> None:
+        for st_el in FuncsManager.stack[::-1]:
+            if st_el.del_var(name):
+                return
+
+        n = len(VariablesManager.variables)
         VariablesManager.variables = set(filter(lambda x: x.name != name, VariablesManager.variables))
+
+        if len(VariablesManager.variables) == n:
+            raise NameError(f'To be deleted variable "{name}" must exists')
 
 
 class StackElement:
@@ -104,8 +115,11 @@ class StackElement:
 
         self.vars.add(var)
 
-    def del_var(self, name: str) -> None:
+    def del_var(self, name: str) -> bool:
+        n = len(self.vars)
         self.vars = set(filter(lambda x: x.name != name, self.vars))
+
+        return n < len(self.vars)
 
 
 class FuncsManager:

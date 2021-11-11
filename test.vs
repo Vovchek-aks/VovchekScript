@@ -1,64 +1,38 @@
-$fibonacci
-.fun_start
-    $n
-    .fvar
+$ab0
+$list
+.var
 
-    @n
-    !1
-    .gt
-    .not
-    .if_start
-        .cb
-        @n
-        .fun_stop
-    .if_end
-    .cb
+@list
+.print
+.cb
+.print
 
-    @n
-    !-1
-    .sum
-    .fibonacci
-    $ret1
-    .fvar
+@list
+!0
+.get_item
+.print
+.cb
+.print
 
-    @n
-    !-2
-    .sum
-    .fibonacci
-    @ret1
-    .sum
-.fun_end
+@list
+!1
+.get_item
+.print
+.cb
+.print
 
+@list
+!2
+.get_item
+.print
+.cb
+.print
 
-$main
-.fun_start
-    !0
-    $i
-    .var
+@list
+!4
+.get_item
+.print
+.cb
+.print
 
-    .rep_start
-        @i
-        .print
-        .cb
-        $\t\t
-        .compile_str
-        .print
-        .cb
-
-        @i
-        .fibonacci
-        .print
-        .cb
-        .print
-
-        @i
-        !1
-        .sum
-        $i
-        .var
-    .rep_end
-.fun_end
-
-
-.main
 
