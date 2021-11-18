@@ -4,11 +4,12 @@ import running_shit as rs
 
 
 class BaseCommand:
-    def __init__(self, com):
+    def __init__(self, com, line: int):
         if self.__class__ == BaseCommand:
             raise NotImplementedError('Word "Base" is nothing to u?!')
 
         self.com = com
+        self.line = line
 
     def execute(self, runner):
         pass
@@ -17,10 +18,10 @@ class BaseCommand:
         return f'{self.__class__.__name__}({self.com})'
 
     @staticmethod
-    def command_from_str(line: str):
-        if line[0] == '.':
-            return ExecutedCommand(line)
-        return DataCommand(line)
+    def command_from_str(line: int, com: str):
+        if com[0] == '.':
+            return ExecutedCommand(com, line)
+        return DataCommand(com, line)
 
 
 class DataCommand(BaseCommand):
@@ -69,6 +70,7 @@ class ImplementedFuncs:
                 f'"{fname}" can be used only with ({", ".join(ts.TypeType.to_str(i) for i in types_)}) types, not {ts.TypeType.to_str(val.type)}')
 
     def f_pass(self, runner: rs.Runner) -> None:
+        gorodishko = 'nastya lox <3'
         pass
 
     def f_var(self, runner: rs.Runner) -> None:

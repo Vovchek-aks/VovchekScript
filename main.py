@@ -1,11 +1,14 @@
-from text_to_program import ShitDeleter, TestToProgramConverter
+from text_to_program import Converter
 from running_shit import Runner
+from errors_shit import ErrorHandler
 
 
 # try:
-runner = Runner(TestToProgramConverter.convert(ShitDeleter.del_shit(open('test.vs', encoding='utf-8').read())))
-while not runner.execute():
-    pass
+runner = Runner(Converter.real_convert(open('test.vs', encoding='utf-8').read()))
 
-# except Exception as ex:
-#     print(f'{ex.__class__.__name__}: {ex}\n')
+try:
+    while not runner.execute():
+        pass
+except Exception as ex:
+    ErrorHandler.handle(ex, runner)
+
