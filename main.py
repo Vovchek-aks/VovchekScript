@@ -3,7 +3,6 @@ from running_shit import Runner
 from errors_shit import ErrorHandler
 
 
-# try:
 runner = Runner(Converter.real_convert(open('test.vs', encoding='utf-8').read()))
 
 try:

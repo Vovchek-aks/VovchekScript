@@ -15,6 +15,9 @@ class Value:
     def to_str(self):
         return self.type.to_str(self.val)
 
+    def to_err(self):
+        return f'{self.val}: {t.TypeType.to_str(self.type)}'
+
     # def __repr__(self):
     #     return f'{t.TypeType.to_str(self.type)}: {self.type.to_str(self.val)}'
 
@@ -23,6 +26,9 @@ class Variable:
     def __init__(self, name: str, value: Value):
         self.name = name
         self.value = value
+
+    def to_err(self):
+        return f'{self.name} = {self.value.to_err()}'
 
     # def __repr__(self):
     #     return f'{self.name} = {self.value.__repr__()}'
@@ -46,6 +52,10 @@ class BufferManager:
     @staticmethod
     def get() -> Value:
         return eval('BufferManager.buffer' + '.val[-1]' * BufferManager.depth_of_lists)
+
+    @staticmethod
+    def to_err():
+        return BufferManager.buffer.to_str()
 
 
 class VariablesManager:
@@ -89,10 +99,15 @@ class VariablesManager:
         if len(VariablesManager.variables) == n:
             raise NameError(f'To be deleted variable "{name}" must exists')
 
+    @staticmethod
+    def to_err():
+        return '\n'.join(map(Variable.to_err, VariablesManager.variables))
+
 
 class StackElement:
-    def __init__(self, line: int):
+    def __init__(self, line: int, fname: str):
         self.line = line
+        self.fname = fname
         self.vars = set()
 
     def get_var(self, name: str) -> Variable:
@@ -100,8 +115,6 @@ class StackElement:
 
         if len(ret):
             return ret[0]
-
-        return None
 
     def add_var(self, var: Variable) -> None:
         f = True
@@ -120,6 +133,9 @@ class StackElement:
         self.vars = set(filter(lambda x: x.name != name, self.vars))
 
         return n < len(self.vars)
+
+    def to_err(self):
+        return f'enter in {self.fname}:\n' + '\n'.join(map(Variable.to_err, self.vars)) + '\n'
 
 
 class FuncsManager:
@@ -154,7 +170,7 @@ class FuncsManager:
     @staticmethod
     def fun_execute(name: str, runner: rs.Runner) -> None:
         f_line = FuncsManager.get_line(name)
-        FuncsManager.stack += [StackElement(runner.cursor)]
+        FuncsManager.stack += [StackElement(runner.cursor, name)]
 
         runner.goto(f_line)
 
@@ -162,7 +178,7 @@ class FuncsManager:
     def fun_return(runner: rs.Runner) -> None:
         runner.goto(FuncsManager.stack.pop(-1).line)
 
-
-
-
-
+    @staticmethod
+    def to_err():
+        return 'Funcs:\n' + '\n'.join(map(lambda x: f'{x[0]} at line {x[1]}', FuncsManager.funcs)) + '\n\nStack:\n' + \
+               '\n'.join(map(StackElement.to_err, FuncsManager.stack))

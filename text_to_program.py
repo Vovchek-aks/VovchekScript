@@ -8,6 +8,7 @@ class Converter:
 
     @staticmethod
     def del_shit(text: list) -> list:
+        text = map(lambda x: (x[0], x[1].split()[0] if x[1].split() else ''), text)
         return list(filter(lambda x: x[1] and x[1][0] in '.!$%?~@', text))
 
     @staticmethod

@@ -1,5 +1,8 @@
 class Runner:
     def __init__(self, program: list):
+        if not len(program):
+            exit(0)
+
         self.program = program
         self.cursor = 0
 

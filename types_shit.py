@@ -19,7 +19,7 @@ class TypeType(BaseType):
 
     @staticmethod
     def to_str(val: MY_TYPE) -> str:
-        return val.__name__[:-4]
+        return val.__name__[:-4].lower()
 
 
 class IntType(BaseType):

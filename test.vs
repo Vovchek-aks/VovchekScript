@@ -1,38 +1,38 @@
-$ab0
-$list
+$err_fun
+.fun_start
+    $n
+    .fvar
+
+    @n
+    !2
+    .sum
+    $b
+    .fvar
+
+    @b
+    .print
+    .cb
+    .print
+
+    @n
+    !0
+    .eq
+    .if_start
+        .cb
+        .not
+    .if_end
+
+    .cb
+    @n
+    !-1
+    .sum
+    .err_fun
+.fun_end
+
+
+!10
+$number
 .var
 
-@list
-.print
-.cb
-.print
-
-@list
-!0
-.get_item
-.print
-.cb
-.print
-
-@list
-!1
-.get_item
-.print
-.cb
-.print
-
-@list
-!2
-.get_item
-.print
-.cb
-.print
-
-@list
-!4
-.get_item
-.print
-.cb
-.print
-
-
+@number
+.err_fun
