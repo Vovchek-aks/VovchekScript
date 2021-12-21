@@ -3,7 +3,7 @@ import os
 name = input('Project name:\n')
 
 if os.path.exists(f'projects/{name}'):
-    input(f'project with name "{name}" already exists')
+    input(f'Project with name "{name}" already exists')
     exit(0)
 
 os.mkdir(f'projects/{name}')
@@ -17,4 +17,4 @@ f.write('{\n\t"libs": []\n}\n')
 f = open(f'projects/{name}/run.py', 'w')
 f.write('from core.main import run\n\nrun("main.vs", absolute=True)\n')
 
-input('project created successful')
+input('Project created successful')
