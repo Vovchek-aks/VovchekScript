@@ -1,6 +1,6 @@
-import data_shit as ds
-import types_shit as ts
-import running_shit as rs
+import core.data_shit as ds
+import core.types_shit as ts
+import core.running_shit as rs
 
 
 class BaseCommand:

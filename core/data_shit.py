@@ -1,5 +1,5 @@
-import types_shit as t
-import running_shit as rs
+import core.types_shit as t
+import core.running_shit as rs
 
 
 class Value:

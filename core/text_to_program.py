@@ -1,4 +1,4 @@
-import program_shit as ps
+import core.program_shit as ps
 
 
 class Converter:

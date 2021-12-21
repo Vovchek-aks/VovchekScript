@@ -1,6 +1,6 @@
-from running_shit import Runner
+from core.running_shit import Runner
+from core.data_shit import VariablesManager, FuncsManager, BufferManager
 from termcolor import cprint
-from data_shit import VariablesManager, FuncsManager, BufferManager
 
 
 class ErrorHandler:
