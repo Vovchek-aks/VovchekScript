@@ -7,14 +7,10 @@ if os.path.exists(f'projects/{name}'):
     exit(0)
 
 os.mkdir(f'projects/{name}')
-os.mkdir(f'projects/{name}/side_code')
 
 open(f'projects/{name}/main.vs', 'w').close()
 
-f = open(f'projects/{name}/libs.json', 'w')
-f.write('{\n\t"libs": []\n}\n')
-
 f = open(f'projects/{name}/run.py', 'w')
-f.write('from core.main import run\n\nrun("main.vs", absolute=True)\n')
+f.write('from core.main import run\n\n\nrun("main.vs", absolute=True)\n')
 
 input('Project created successful')
