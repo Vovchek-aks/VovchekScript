@@ -10,7 +10,12 @@ def run(fname: str, absolute=False) -> None:
         input(f'No project on path "core/{path}"')
         exit(0)
 
-    runner = Runner(Converter.real_convert(open(path, encoding='utf-8').read()))
+    runner = None
+
+    try:
+        runner = Runner(Converter.real_convert(path))
+    except Exception as ex:
+        ErrorHandler.compile_handle(ex)
 
     try:
         while not runner.execute():

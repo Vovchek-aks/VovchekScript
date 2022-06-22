@@ -59,7 +59,7 @@ class ImplementedFuncs:
     def buf_len_check(fname: str, n: int) -> None:
         buf = ds.BufferManager.buffer.val
         if len(buf) != n:
-            raise ValueError(f'"{fname}" can be used only with {n} value in the buffer, not {len(buf)}')
+            raise ValueError(f'"{fname}" can be used only with {n} value(s) in the buffer, not {len(buf)}')
 
     @staticmethod
     def type_check(fname: str, val: ds.Value, *types_: ts.BaseType) -> None:

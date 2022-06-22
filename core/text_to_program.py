@@ -1,4 +1,5 @@
 import core.program_shit as ps
+import os
 
 
 class Converter:
@@ -19,5 +20,29 @@ class Converter:
         return program
 
     @staticmethod
-    def real_convert(text: str) -> list:
+    def add_libs(libs: str) -> list:
+        vscode = []
+        for i in libs.strip().split():
+            if not os.path.exists(i):
+                raise NameError(f'There is no file "{i}"')
+            if i[-3:] != '.vs':
+                raise NameError(f'Only VovchekScrypt in this house, not "{i}"')
+
+            vscode += Converter.real_convert(i)
+
+        return vscode
+
+    @staticmethod
+    def real_convert(path: str) -> list:
+        text = open(path, encoding='utf-8').read()
+
+        x = text.count('##---##')
+
+        if x > 1:
+            raise ValueError('"##---##" can be only once in code')
+
+        if x == 1:
+            libs, text = text.split('##---##')
+            return Converter.add_libs(libs) + Converter.convert(Converter.del_shit(Converter.enumerate_lines(text)))
+
         return Converter.convert(Converter.del_shit(Converter.enumerate_lines(text)))
