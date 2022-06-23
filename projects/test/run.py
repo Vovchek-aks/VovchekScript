@@ -1,4 +1,5 @@
 from core.main import run
+import os
 
 
-run("main.vs", absolute=True)
+run(f"{os.getcwd()}\\main.vs", absolute=True)

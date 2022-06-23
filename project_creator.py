@@ -11,6 +11,11 @@ os.mkdir(f'projects/{name}')
 open(f'projects/{name}/main.vs', 'w').close()
 
 f = open(f'projects/{name}/run.py', 'w')
-f.write('from core.main import run\n\n\nrun("main.vs", absolute=True)\n')
+f.write("""from core.main import run
+import os
+
+
+run(f"{os.getcwd()}\\main.vs", absolute=True)
+""")
 
 input('Project created successful')

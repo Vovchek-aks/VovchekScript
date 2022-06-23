@@ -20,15 +20,16 @@ class Converter:
         return program
 
     @staticmethod
-    def add_libs(libs: str) -> list:
+    def add_libs(libs: str, path: str) -> list:
         vscode = []
         for i in libs.strip().split():
-            if not os.path.exists(i):
+            cp = '\\'.join(path.split('\\')[:-1]) + f'\\{i}'
+            if not os.path.exists(cp):
                 raise NameError(f'There is no file "{i}"')
             if i[-3:] != '.vs':
                 raise NameError(f'Only VovchekScrypt in this house, not "{i}"')
 
-            vscode += Converter.real_convert(i)
+            vscode += Converter.real_convert(cp)
 
         return vscode
 
@@ -43,6 +44,6 @@ class Converter:
 
         if x == 1:
             libs, text = text.split('##---##')
-            return Converter.add_libs(libs) + Converter.convert(Converter.del_shit(Converter.enumerate_lines(text)))
+            return Converter.add_libs(libs, path) + Converter.convert(Converter.del_shit(Converter.enumerate_lines(text)))
 
         return Converter.convert(Converter.del_shit(Converter.enumerate_lines(text)))

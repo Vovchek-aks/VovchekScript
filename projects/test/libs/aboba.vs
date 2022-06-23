@@ -1,4 +1,4 @@
-libs\gnishk.vs
+gnishk.vs
 ##---##
 $aboba
 .space
