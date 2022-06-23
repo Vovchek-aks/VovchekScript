@@ -70,6 +70,11 @@ class ImplementedFuncs:
             raise TypeError(
                 f'"{fname}" can be used only with ({", ".join(ts.TypeType.to_str(i) for i in types_)}) types, not {ts.TypeType.to_str(val.type)}')
 
+    @staticmethod
+    def name_chek(name: str) -> None:
+        if len(name.strip().split()) != 1:
+            raise NameError(f'Name to variable or function can be only 1 word, not "{name}"')
+
     def f_pass(self, runner: rs.Runner) -> None:
         gorodishko = 'nastya lox <3'
         pass
@@ -78,6 +83,7 @@ class ImplementedFuncs:
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.buf_len_check('.var', 2)
         ImplementedFuncs.type_check('.var', buf[1], ts.StrType())
+        ImplementedFuncs.name_chek(buf[1].val)
 
         ds.VariablesManager.add(ds.Variable(buf[1].val, buf[0]))
         ds.BufferManager.clear()
@@ -86,6 +92,7 @@ class ImplementedFuncs:
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.buf_len_check('.fvar', 2)
         ImplementedFuncs.type_check('.fvar', buf[1], ts.StrType())
+        ImplementedFuncs.name_chek(buf[1].val)
 
         ds.FuncsManager.stack[-1].add_var(ds.Variable(buf[1].val, buf[0]))
         ds.BufferManager.clear()
@@ -174,6 +181,7 @@ class ImplementedFuncs:
         ImplementedFuncs.buf_len_check('.fun_start', 1)
         buf = ds.BufferManager.buffer.val
         ImplementedFuncs.type_check('.fun_start', buf[0], ts.StrType())
+        ImplementedFuncs.name_chek(buf[0].val)
 
         ds.FuncsManager.add(buf[0].val, runner.cursor)
         ds.BufferManager.clear()
@@ -246,3 +254,14 @@ class ImplementedFuncs:
         val = buf[0].val[buf[1].val]
         ds.BufferManager.clear()
         ds.BufferManager.add(val)
+
+    def f_error(self, runner: rs.Runner) -> None:
+        ImplementedFuncs.buf_len_check('.error', 1)
+        buf = ds.BufferManager.buffer.val
+        ImplementedFuncs.type_check('.error', buf[0], ts.StrType())
+
+        raise es.InCodeError(buf[0].val)
+
+
+
+

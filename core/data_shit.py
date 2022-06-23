@@ -31,20 +31,13 @@ class Value:
         return self.TYPE_TO_SYMBOL[self.type] + self.type.to_str(self.val)
 
 
-    # def __repr__(self):
-    #     return f'{t.TypeType.to_str(self.type)}: {self.type.to_str(self.val)}'
-
-
 class Variable:
     def __init__(self, name: str, value: Value):
         self.name = name
         self.value = value
 
     def to_err(self):
-        return f'{self.name} = {self.value.to_err()}'
-
-    # def __repr__(self):
-    #     return f'{self.name} = {self.value.__repr__()}'
+        return f'{self.name}: {self.value.to_err()}'
 
 
 class BufferManager:
@@ -114,7 +107,8 @@ class VariablesManager:
 
     @staticmethod
     def to_err():
-        return '\n'.join(map(Variable.to_err, VariablesManager.variables))
+        return '\n'.join(map(Variable.to_err, VariablesManager.variables)) \
+            if VariablesManager.variables else 'no vars'
 
 
 class StackElement:
@@ -193,5 +187,7 @@ class FuncsManager:
 
     @staticmethod
     def to_err():
-        return 'Funcs:\n' + '\n'.join(map(lambda x: f'{x[0]} at line {x[1]}', FuncsManager.funcs)) + '\n\nStack:\n' + \
-               '\n'.join(map(StackElement.to_err, FuncsManager.stack))
+        return 'Funcs:\n' + ('\n'.join(map(lambda x: f'{x[0]} at line {x[1]}', FuncsManager.funcs))
+                             if FuncsManager.funcs else 'no funcs\n') + \
+               '\nStack:\n' + ('\n'.join(map(StackElement.to_err, FuncsManager.stack))
+                               if FuncsManager.stack else 'no stack\n')
