@@ -59,4 +59,4 @@ class ListType(BaseType):
     @staticmethod
     def to_str(val: MY_TYPE) -> str:
         return 'list_start\n' + '\n'.join(
-            map(lambda x: '\t' + x.replace('\n', '\n\t'), map(lambda x: x.type.to_str(x.val), val))) + '\nlist_end'
+            map(lambda x: '\t' + x.replace('\n', '\n\t'), map(lambda x: x.to_list(), val))) + '\nlist_end'

@@ -1,11 +1,7 @@
-libs\aboba.vs
-##---##
+.list_start
+    !123
+    %14
+    $edededed
+.list_end
 
-$is
-.space
-.sum
-$good!
-.sum
-.print
-.cb
 .print

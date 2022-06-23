@@ -3,6 +3,15 @@ import core.running_shit as rs
 
 
 class Value:
+    TYPE_TO_SYMBOL = {
+        t.TypeType: '~',
+        t.IntType: '!',
+        t.FloatType: '%',
+        t.StrType: '$',
+        t.BoolType: '?',
+        t.ListType: ''
+    }
+
     def __init__(self, type_: t.BaseType, val):
         type_ = type_.__class__
 
@@ -16,7 +25,11 @@ class Value:
         return self.type.to_str(self.val)
 
     def to_err(self):
-        return f'{self.val}: {t.TypeType.to_str(self.type)}'
+        return f'{self.TYPE_TO_SYMBOL[self.type]}{self.val}'
+
+    def to_list(self):
+        return self.TYPE_TO_SYMBOL[self.type] + self.type.to_str(self.val)
+
 
     # def __repr__(self):
     #     return f'{t.TypeType.to_str(self.type)}: {self.type.to_str(self.val)}'

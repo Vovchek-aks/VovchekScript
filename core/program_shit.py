@@ -1,6 +1,7 @@
 import core.data_shit as ds
 import core.types_shit as ts
 import core.running_shit as rs
+import core.errors_shit as es
 
 
 class BaseCommand:
@@ -243,6 +244,5 @@ class ImplementedFuncs:
                 f'To get item from {ts.TypeType.to_str(buf[0].type)} its length must be >= {buf[1].val} + 1, not {len(buf[0].val)}')
 
         val = buf[0].val[buf[1].val]
-
         ds.BufferManager.clear()
-        ds.BufferManager.add(ds.Value(ts.StrType() if val.__class__ == str else val.__class__(), val))
+        ds.BufferManager.add(val)
