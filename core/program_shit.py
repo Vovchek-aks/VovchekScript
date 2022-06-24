@@ -26,21 +26,13 @@ class BaseCommand:
 
 
 class DataCommand(BaseCommand):
-    SYMBOL_TO_TYPE = {
-        '~': ts.TypeType,
-        '!': ts.IntType,
-        '%': ts.FloatType,
-        '$': ts.StrType,
-        '?': ts.BoolType
-    }
-
     def execute(self, runner):
         val = None
 
         if self.com[0] == '@':
             val = ds.VariablesManager.get(self.com[1:]).value
         else:
-            tp = self.SYMBOL_TO_TYPE[self.com[0]]
+            tp = ts.SYMBOL_TO_TYPE[self.com[0]]
             val = ds.Value(tp(), tp.convert_to(self.com[1:]))
 
         ds.BufferManager.add(val)
@@ -149,7 +141,7 @@ class ImplementedFuncs:
         ds.BufferManager.depth_of_lists += 1
 
     def f_list_end(self, runner: rs.Runner) -> None:
-        if not ds.BufferManager.depth_of_lists:
+        if ds.BufferManager.depth_of_lists == 0:
             raise ValueError('command ".list_end" must be after ".list_start"')
         ds.BufferManager.depth_of_lists -= 1
 
@@ -261,6 +253,13 @@ class ImplementedFuncs:
         ImplementedFuncs.type_check('.error', buf[0], ts.StrType())
 
         raise es.InCodeError(buf[0].val)
+
+    def f_type(self, runner: rs.Runner) -> None:
+        ImplementedFuncs.buf_len_check('.type', 1)
+        val = ds.BufferManager.buffer.val[0]
+
+        ds.BufferManager.clear()
+        ds.BufferManager.add(ds.Value(ts.TypeType(), val.type))
 
 
 

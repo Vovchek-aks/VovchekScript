@@ -1,2 +1,3 @@
-$amogus
-.error
+~!
+.type
+.print

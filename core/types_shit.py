@@ -15,11 +15,13 @@ class TypeType(BaseType):
 
     @classmethod
     def convert_to(cls, text: str) -> type(MY_TYPE):
-        return eval(text.capitalize() + 'Type')
+        if len(text) != 1:
+            raise ValueError(f'To make a "type" u need write "~" and type sign, like "~!" or "~$"')
+        return SYMBOL_TO_TYPE[text]
 
     @staticmethod
     def to_str(val: MY_TYPE) -> str:
-        return val.__name__[:-4].lower()
+        return f'{TYPE_TO_SYMBOL[val]}'
 
 
 class IntType(BaseType):
@@ -60,3 +62,21 @@ class ListType(BaseType):
     def to_str(val: MY_TYPE) -> str:
         return 'list_start\n' + '\n'.join(
             map(lambda x: '\t' + x.replace('\n', '\n\t'), map(lambda x: x.to_list(), val))) + '\nlist_end'
+
+
+TYPE_TO_SYMBOL = {
+    TypeType: '~',
+    IntType: '!',
+    FloatType: '%',
+    StrType: '$',
+    BoolType: '?',
+    ListType: ''
+}
+
+SYMBOL_TO_TYPE = {
+    '~': TypeType,
+    '!': IntType,
+    '%': FloatType,
+    '$': StrType,
+    '?': BoolType
+}

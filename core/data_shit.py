@@ -3,32 +3,28 @@ import core.running_shit as rs
 
 
 class Value:
-    TYPE_TO_SYMBOL = {
-        t.TypeType: '~',
-        t.IntType: '!',
-        t.FloatType: '%',
-        t.StrType: '$',
-        t.BoolType: '?',
-        t.ListType: ''
-    }
 
     def __init__(self, type_: t.BaseType, val):
         type_ = type_.__class__
 
-        if type_.MY_TYPE not in val.__class__.__bases__ + (val.__class__,):
-            raise TypeError(f'"{val.__repr__()}" cant be {type_.__name__}')
+        if (type_.MY_TYPE not in val.__class__.__bases__ + (val.__class__,)) and \
+                not ((type_ == t.TypeType) and (t.BaseType in val.__bases__)):
+            raise TypeError(f'"{val.__name__}" cant be {type_.__name__}')
 
         self.type = type_
         self.val = val
 
     def to_str(self):
-        return self.type.to_str(self.val)
+        return self.type.to_str(self.val) if self.type != t.TypeType else self.to_list()
 
     def to_err(self):
-        return f'{self.TYPE_TO_SYMBOL[self.type]}{self.val}'
+        return f'{t.TYPE_TO_SYMBOL[self.type]}{self.val}'
 
     def to_list(self):
-        return self.TYPE_TO_SYMBOL[self.type] + self.type.to_str(self.val)
+        return t.TYPE_TO_SYMBOL[self.type] + self.type.to_str(self.val)
+
+    def __repr__(self):
+        return f'Value({self.type}, {self.val})'
 
 
 class Variable:
